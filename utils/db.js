@@ -29,6 +29,13 @@ class DBClient {
   async nbFiles() {
     return this.db.collection('files').countDocuments();
   }
+
+  getDb() {
+    if (!this.db) {
+      throw new Error('Database not connected');
+    }
+    return this.db;
+  }
 }
 
 const dbClient = new DBClient();
