@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import dbClient from '../utils/db';
+import redisClient from '../utils/redis';
 
 class UsersController {
   // POST /users endpoint
@@ -41,6 +42,30 @@ class UsersController {
     } catch (error) {
       console.error('Error in postNew:', error);
       return res.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
+
+  static async getMe(req, res) {
+    try {
+      const token = req.headers['x-token'];
+      if (!token) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      const userId = await redisClient.get(`auth_${token}`);
+      if (!userId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      const user = await dbClient.getDb().collection('users').findOne({ _id: new MongoClient.ObjectID(userId) });
+      if (!user) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      res.status(200).json({ id: user._id.toString(), email: user.email });
+    } catch (err) {
+      console.error('Error in getMe:', err);
+      res.status(500).json({ error: 'Internal Server Error' });
     }
   }
 }
