@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { ObjectId } from 'mongodb';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
 
@@ -57,7 +58,7 @@ class UsersController {
     }
 
     try {
-      const user = await dbClient.getDb().collection('users').findOne({ _id: new dbClient.client.ObjectID(userId) });
+      const user = await dbClient.getDb().collection('users').findOne({ _id: new ObjectId(userId) });
       if (!user) {
         return res.status(401).json({ error: 'Unauthorized' });
       }
