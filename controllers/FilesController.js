@@ -25,7 +25,7 @@ class FilesController {
     }
 
     if (!['folder', 'file', 'image'].includes(type)) {
-      return res.status(400).json({ error: 'Invalid type' });
+      return res.status(400).json({ error: 'Missing type' });
     }
 
     if (type !== 'folder' && !data) {
@@ -78,11 +78,11 @@ class FilesController {
     const fileId = req.params.id;
 
     try {
-      const file = await dbClient.getDb().collection('files').findOne({ _id: ObjectId(fileId), userId: ObjectId(userId) });
+      const file = await dbClient.collection('files').findOne({ _id: ObjectId(fileId), userId: ObjectId(userId) });
       if (!file) return res.status(404).json({ error: 'Not found' });
       return res.json(file);
     } catch (err) {
-      return res.status(500).json({ error: 'Internal server error' });
+      return res.status(404).json({ error: 'Not found' });
     }
   }
 
@@ -102,7 +102,7 @@ class FilesController {
         { $limit: pageSize },
       ];
 
-      const files = await dbClient.getDb().collection('files').aggregate(pipeline).toArray();
+      const files = await dbClient.collection('files').aggregate(pipeline).toArray();
       return res.json(files);
     } catch (err) {
       return res.status(500).json({ error: 'Internal server error' });
@@ -117,7 +117,7 @@ class FilesController {
     const fileId = req.params.id;
 
     try {
-      const file = await dbClient.getDb().collection('files').findOneAndUpdate(
+      const file = await dbClient.collection('files').findOneAndUpdate(
         { _id: ObjectId(fileId), userId: ObjectId(userId) },
         { $set: { isPublic: true } },
         { returnDocument: 'after' },
@@ -139,7 +139,7 @@ class FilesController {
     const fileId = req.params.id;
 
     try {
-      const file = await dbClient.getDb().collection('files').findOneAndUpdate(
+      const file = await dbClient.collection('files').findOneAndUpdate(
         { _id: ObjectId(fileId), userId: ObjectId(userId) },
         { $set: { isPublic: false } },
         { returnDocument: 'after' },
